@@ -1,10 +1,3 @@
-window.addEventListener("offline", () => {
-  const deleteRequest = indexedDB.deleteDatabase("OfflineBudget");
-  deleteRequest.onsuccess = (event) => {
-    console.log("Deleted");
-  };
-});
-
 function saveRecord(data) {
   if (!navigator.onLine) {
     const request = indexedDB.open("OfflineBudget", 1);
@@ -28,13 +21,13 @@ function saveRecord(data) {
 }
 
 window.addEventListener("online", () => {
-  location.reload();
   const request = indexedDB.open("OfflineBudget");
   request.onsuccess = (event) => {
     const db = event.target.result;
-    const transaction = db.transaction(["offlineTransactions"], "readonly");
+    const transaction = db.transaction(["offlineTransactions"], "readwrite");
     const objectStore = transaction.objectStore("offlineTransactions");
     const pullRequest = objectStore.getAll();
+    objectStore.clear();
     pullRequest.onsuccess = (event) => {
       const data = event.target.result;
       fetch("/api/transaction/bulk", {
@@ -45,7 +38,7 @@ window.addEventListener("online", () => {
         },
         body: JSON.stringify(data),
       }).then((res) => {
-        return res.json();
+        res.json();
       });
     };
   };
