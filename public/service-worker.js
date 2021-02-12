@@ -26,14 +26,16 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((item) => {
-          if (cacheAllowList.indexOf(item) === -1) {
-            return caches.delete(item);
+        cacheNames.map((cacheName) => {
+          if (cacheAllowList.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
           }
         })
       );
     })
   );
+
+  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
