@@ -15,15 +15,12 @@ request.onsuccess = (event) => {
 };
 
 function saveRecord(data) {
-  console.log(db);
   const transaction = db.transaction(["offlineTransactions"], "readwrite");
-  console.log(transaction);
   const objectStore = transaction.objectStore("offlineTransactions");
   const addRequest = objectStore.add(data);
 }
 
 window.addEventListener("online", () => {
-  console.log(db);
   const transaction = db.transaction(["offlineTransactions"], "readwrite");
   const objectStore = transaction.objectStore("offlineTransactions");
   const pullRequest = objectStore.getAll();
