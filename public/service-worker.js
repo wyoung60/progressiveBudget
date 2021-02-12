@@ -21,6 +21,21 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
+self.addEventListener("activate", (event) => {
+  const cacheAllowList = ["url-cache-v1", "data-cache-v1"];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((item) => {
+          if (cacheAllowList.indexOf(item) === -1) {
+            return caches.delete(item);
+          }
+        })
+      );
+    })
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("/api/")) {
     event.respondWith(
@@ -49,21 +64,6 @@ self.addEventListener("fetch", (event) => {
       return cache.match(event.request).then((response) => {
         return response || fetch(event.request);
       });
-    })
-  );
-});
-
-self.addEventListener("activate", (event) => {
-  const cacheAllowList = ["url-cache-v1", "data-cache-v1"];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((item) => {
-          if (cacheAllowList.indexOf(item) === -1) {
-            return caches.delete(item);
-          }
-        })
-      );
     })
   );
 });
